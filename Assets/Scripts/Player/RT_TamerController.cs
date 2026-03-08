@@ -43,6 +43,7 @@ public class RT_TamerController : MonoBehaviour
     private void Update()
     {
         TickTimers();
+        UpdateAnimation(); // 매 프레임 실행 → 입력 즉시 반영, 대시 중 방향 유지
     }
 
     private void FixedUpdate()
@@ -50,7 +51,6 @@ public class RT_TamerController : MonoBehaviour
         if (_isDashing) return; // 대시 중 이동 입력 무시
 
         _rb.linearVelocity = _moveInput * GameConstants.PLAYER_MOVE_SPEED;
-        UpdateAnimation();
     }
 
     private void TickTimers()
@@ -121,13 +121,26 @@ public class RT_TamerController : MonoBehaviour
     {
         if (_animator == null) return;
 
-        bool isMoving = _moveInput.sqrMagnitude > 0.01f;
-        _animator.SetBool("IsMoving", isMoving);
+        bool    isMoving;
+        Vector2 animDir;
 
+        if (_isDashing)
+        {
+            // 대시 중: 항상 대시 방향(= 마지막 이동 방향)으로 Walk 애니메이션 재생
+            isMoving = true;
+            animDir  = _lastMoveDir;
+        }
+        else
+        {
+            isMoving = _moveInput.sqrMagnitude > 0.01f;
+            animDir  = _moveInput;
+        }
+
+        _animator.SetBool("IsMoving", isMoving);
         if (isMoving)
         {
-            _animator.SetFloat("MoveX", _moveInput.x);
-            _animator.SetFloat("MoveY", _moveInput.y);
+            _animator.SetFloat("MoveX", animDir.x);
+            _animator.SetFloat("MoveY", animDir.y);
         }
     }
 
