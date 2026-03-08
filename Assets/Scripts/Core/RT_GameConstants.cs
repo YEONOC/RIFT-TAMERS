@@ -74,6 +74,15 @@ public static class GameConstants
     public const float STATUS_POISON_DEF_PENALTY   = 0.2f;
     public const float STATUS_STUN_DURATION        = 1.5f;
 
+    // ─── 플레이어 이동 ────────────────────────────────────────────────────────
+    public const float PLAYER_MOVE_SPEED      = 5f;
+    public const float PLAYER_DASH_SPEED_MULT = 3f;
+    public const float PLAYER_DASH_DURATION   = 0.2f;
+    public const float PLAYER_DASH_COOLDOWN   = 1f;
+
+    // ─── 카메라 추적 ─────────────────────────────────────────────────────────
+    public const float CAMERA_FOLLOW_SMOOTH   = 5f;
+
     // ─── 비주얼 / 카메라 ──────────────────────────────────────────────────
     public const int PIXELS_PER_UNIT = 16;
 
