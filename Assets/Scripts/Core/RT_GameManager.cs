@@ -1,12 +1,24 @@
-using UnityEngine;
+using System.Collections;
 using System.IO;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
-/// 게임 전체 상태를 관리하는 싱글톤 매니저
-/// DontDestroyOnLoad 로 씬 전환 간 데이터를 유지하며 세이브/로드를 담당
+/// 게임 전체 상태를 관리하는 싱글톤 매니저.
+/// DontDestroyOnLoad 로 씬 전환 간 데이터를 유지하며 세이브/로드와 씬 전환을 담당.
 /// </summary>
 public class GameManager : MonoBehaviour
 {
+    // ─────────────────────────────────────────
+    // 씬 인덱스 상수
+    // ─────────────────────────────────────────
+    public const int SCENE_MAIN_MENU = 0;
+    public const int SCENE_DUNGEON   = 1;
+    public const int SCENE_META_HUB  = 2;
+
+    // ─────────────────────────────────────────
+    // 싱글톤
+    // ─────────────────────────────────────────
     public static GameManager Instance { get; private set; }
 
     [Header("현재 게임 상태")]
@@ -21,6 +33,11 @@ public class GameManager : MonoBehaviour
     private static readonly string SAVE_FILE_NAME = "save.json";
     private string SaveFilePath => Path.Combine(Application.persistentDataPath, SAVE_FILE_NAME);
 
+    private bool _isTransitioning;
+
+    // ─────────────────────────────────────────
+    // 초기화
+    // ─────────────────────────────────────────
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -34,11 +51,86 @@ public class GameManager : MonoBehaviour
         LoadSave();
     }
 
+    // ─────────────────────────────────────────
+    // 게임 상태 제어
+    // ─────────────────────────────────────────
+
     /// <summary>게임 상태 전환</summary>
     public void SetState(GameState newState)
     {
         _currentState = newState;
     }
+
+    // ─────────────────────────────────────────
+    // 씬 전환 퍼블릭 API
+    // ─────────────────────────────────────────
+
+    /// <summary>메인 메뉴로 이동</summary>
+    public void GoToMainMenu()
+    {
+        SetState(GameState.MainMenu);
+        LoadScene(SCENE_MAIN_MENU);
+    }
+
+    /// <summary>새 런을 시작하고 던전으로 이동</summary>
+    public void StartNewRun()
+    {
+        SaveData.isRunActive = true;
+        SaveData.currentZone = 1;
+        SaveData.currentFloor = 1;
+        SaveData.runSeed = System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        SetState(GameState.InRun);
+        LoadScene(SCENE_DUNGEON);
+    }
+
+    /// <summary>런을 종료하고 메타 허브로 이동</summary>
+    public void EndRun()
+    {
+        SaveData.isRunActive = false;
+        SaveGame();
+        SetState(GameState.MetaHub);
+        LoadScene(SCENE_META_HUB);
+    }
+
+    /// <summary>메타 허브에서 기존 런을 이어서 던전으로 이동</summary>
+    public void ContinueRun()
+    {
+        SetState(GameState.InRun);
+        LoadScene(SCENE_DUNGEON);
+    }
+
+    // ─────────────────────────────────────────
+    // 내부 씬 로드 처리
+    // ─────────────────────────────────────────
+
+    private void LoadScene(int sceneIndex)
+    {
+        if (_isTransitioning) return;
+        StartCoroutine(LoadSceneAsync(sceneIndex));
+    }
+
+    private IEnumerator LoadSceneAsync(int sceneIndex)
+    {
+        _isTransitioning = true;
+
+        AsyncOperation op = SceneManager.LoadSceneAsync(sceneIndex);
+        op.allowSceneActivation = false;
+
+        // 로딩 90% 도달 대기
+        while (op.progress < 0.9f)
+            yield return null;
+
+        // TODO: 페이드 아웃 연출 추가 예정
+        op.allowSceneActivation = true;
+
+        yield return new WaitUntil(() => op.isDone);
+
+        _isTransitioning = false;
+    }
+
+    // ─────────────────────────────────────────
+    // 세이브 / 로드
+    // ─────────────────────────────────────────
 
     /// <summary>세이브 데이터를 JSON 파일로 저장</summary>
     public void SaveGame()
