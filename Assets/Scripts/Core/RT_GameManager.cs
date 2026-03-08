@@ -73,21 +73,23 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>새 런을 시작하고 던전으로 이동</summary>
-    public void StartNewRun()
+public void StartNewRun()
     {
         SaveData.isRunActive = true;
         SaveData.currentZone = 1;
         SaveData.currentFloor = 1;
         SaveData.runSeed = System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         SetState(GameState.InRun);
+        GameEvents.RaiseRunStarted();
         LoadScene(SCENE_DUNGEON);
     }
 
     /// <summary>런을 종료하고 메타 허브로 이동</summary>
-    public void EndRun()
+public void EndRun(bool isCleared = false)
     {
         SaveData.isRunActive = false;
         SaveGame();
+        GameEvents.RaiseRunEnded(isCleared);
         SetState(GameState.MetaHub);
         LoadScene(SCENE_META_HUB);
     }
@@ -109,9 +111,12 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoadSceneAsync(sceneIndex));
     }
 
-    private IEnumerator LoadSceneAsync(int sceneIndex)
+private IEnumerator LoadSceneAsync(int sceneIndex)
     {
         _isTransitioning = true;
+
+        // 씬 전환 전 이벤트 리스너 정리 (메모리 누수 방지)
+        GameEvents.ClearAllListeners();
 
         AsyncOperation op = SceneManager.LoadSceneAsync(sceneIndex);
         op.allowSceneActivation = false;
