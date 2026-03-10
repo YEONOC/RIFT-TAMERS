@@ -12,9 +12,76 @@ public static class RT_TilemapSetupTool
     private const string TILESET_PATH = "Assets/Art/Tilesets";
     private const int TILE_SIZE = 16;
 
+    // 타일 PPU: 16px 타일을 1 Unity unit으로 표시
+    private const int TILE_PPU = TILE_SIZE;
+
     // 테스트 방 크기
     private const int ROOM_WIDTH  = 20;
     private const int ROOM_HEIGHT = 12;
+
+    [MenuItem("RiftTamers/Tilemap/Apply Player Setup")]
+    public static void ApplyPlayerSetup()
+    {
+        // 1) PixelPerfectCamera assetsPPU를 높여 줌인 효과 (16→48 : 약 3배 가까워짐)
+        //    리플렉션 사용 — Editor 어셈블리에서 PixelPerfectCamera 직접 참조 불가
+        var cam = Camera.main;
+        if (cam != null)
+        {
+            var ppc = cam.GetComponent("PixelPerfectCamera") as Component;
+            if (ppc != null)
+            {
+                var prop = ppc.GetType().GetProperty("assetsPPU");
+                prop?.SetValue(ppc, 48);
+                EditorUtility.SetDirty(ppc);
+                Debug.Log("[RT_TilemapSetupTool] PixelPerfectCamera assetsPPU → 48 (3x 줌인)");
+            }
+            else
+            {
+                cam.orthographicSize = 3f;
+                EditorUtility.SetDirty(cam);
+                Debug.Log("[RT_TilemapSetupTool] 카메라 orthographicSize → 3");
+            }
+        }
+
+        // 2) Player SpriteRenderer에 crystal_fox 첫 번째 프레임 적용
+        var playerObj = GameObject.Find("Player");
+        if (playerObj == null) { Debug.LogError("[RT_TilemapSetupTool] 'Player' 오브젝트를 찾을 수 없습니다."); return; }
+
+        var sr = playerObj.GetComponent<SpriteRenderer>();
+        if (sr == null) { Debug.LogError("[RT_TilemapSetupTool] SpriteRenderer가 없습니다."); return; }
+
+        // 스프라이트 시트에서 첫 번째 스프라이트 로드
+        var sprites = AssetDatabase.LoadAllAssetsAtPath("Assets/Art/Creatures/crystal_fox_1-Sheet.png");
+        Sprite firstSprite = null;
+        foreach (var asset in sprites)
+        {
+            if (asset is Sprite s) { firstSprite = s; break; }
+        }
+
+        if (firstSprite == null) { Debug.LogError("[RT_TilemapSetupTool] crystal_fox 스프라이트를 찾을 수 없습니다."); return; }
+
+        sr.sprite = firstSprite;
+        EditorUtility.SetDirty(playerObj);
+
+        // 3) Animator 컨트롤러 적용
+        var animator = playerObj.GetComponent<Animator>();
+        if (animator != null)
+        {
+            var controller = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
+                "Assets/Art/Creatures/Player.controller");
+            if (controller != null)
+            {
+                animator.runtimeAnimatorController = controller;
+                EditorUtility.SetDirty(animator);
+                Debug.Log("[RT_TilemapSetupTool] Animator 컨트롤러 적용 완료");
+            }
+        }
+
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+
+        Debug.Log($"[RT_TilemapSetupTool] Player 설정 완료 — 스프라이트: {firstSprite.name}");
+    }
 
     [MenuItem("RiftTamers/Tilemap/Setup Test Room")]
     public static void SetupTestRoom()
@@ -120,7 +187,7 @@ public static class RT_TilemapSetupTool
 
         var importer = (TextureImporter)AssetImporter.GetAtPath(spritePath);
         importer.textureType         = TextureImporterType.Sprite;
-        importer.spritePixelsPerUnit = TILE_SIZE;
+        importer.spritePixelsPerUnit = TILE_PPU;
         importer.filterMode          = FilterMode.Point;
         importer.textureCompression  = TextureImporterCompression.Uncompressed;
         importer.SaveAndReimport();
