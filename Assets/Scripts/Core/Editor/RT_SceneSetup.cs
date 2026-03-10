@@ -50,7 +50,7 @@ public static class RT_SceneSetup
 
         // GameManager
         var gmGo = new GameObject("GameManager");
-        gmGo.AddComponent<GameManager>();
+        gmGo.AddComponent<RT_GameManager>();
 
         // Canvas
         var canvasGo = new GameObject("Canvas");

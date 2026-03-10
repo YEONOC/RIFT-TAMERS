@@ -84,6 +84,14 @@ crashlytics-build.properties
 # TestRunner generated files
 InitTestScene*.unity*
 
+# Unity 크래시 복구 파일
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+
+# 스크린샷 (임시)
+/[Aa]ssets/Screenshots/
+/[Aa]ssets/Screenshots.meta
+
 # Addressables default ignores, before user customizations
 /ServerData
 /[Aa]ssets/StreamingAssets/aa*

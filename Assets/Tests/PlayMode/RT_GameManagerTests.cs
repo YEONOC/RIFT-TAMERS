@@ -11,13 +11,13 @@ using UnityEngine.TestTools;
 public class RT_GameManagerTests
 {
     private GameObject _gmObj;
-    private GameManager _gm;
+    private RT_GameManager _gm;
 
     [UnitySetUp]
     public IEnumerator SetUp()
     {
         _gmObj = new GameObject("GameManager_Test");
-        _gm    = _gmObj.AddComponent<GameManager>();
+        _gm    = _gmObj.AddComponent<RT_GameManager>();
         yield return null; // Awake 실행 대기
     }
 
@@ -38,7 +38,7 @@ public class RT_GameManagerTests
     [UnityTest]
     public IEnumerator Awake_Instance가_자기자신으로_설정된다()
     {
-        Assert.AreEqual(_gm, GameManager.Instance, "Instance가 생성된 GameManager여야 합니다.");
+        Assert.AreEqual(_gm, RT_GameManager.Instance, "Instance가 생성된 GameManager여야 합니다.");
         yield return null;
     }
 
@@ -46,12 +46,12 @@ public class RT_GameManagerTests
     public IEnumerator 중복_GameManager_추가시_즉시_제거된다()
     {
         var duplicateObj = new GameObject("GameManager_Duplicate");
-        duplicateObj.AddComponent<GameManager>();
+        duplicateObj.AddComponent<RT_GameManager>();
         yield return null; // Awake 실행
 
         Assert.IsTrue(duplicateObj == null,
             "중복 GameManager의 GameObject가 제거되지 않았습니다.");
-        Assert.AreEqual(_gm, GameManager.Instance,
+        Assert.AreEqual(_gm, RT_GameManager.Instance,
             "원본 Instance가 유지되어야 합니다.");
     }
 
