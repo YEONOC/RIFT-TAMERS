@@ -345,8 +345,8 @@ public class SaveData
 ## 11. 개발 우선순위 (마일스톤)
 
 ### Milestone 1 — 프로토타입 (핵심 루프 검증)
-- [ ] 기본 씬 구성 (MainMenu, Dungeon, MetaHub)
-- [ ] TamerController (이동, 회피, Q 스킬)
+- [v] 기본 씬 구성 (MainMenu, Dungeon, MetaHub)
+- [v] TamerController (이동, 회피, Q 스킬)
 - [ ] 크리처 1~3종 구현 (CreatureData + CreatureAI)
 - [ ] 단순 전투방 1종 구현
 - [ ] 기본 포획 시스템 (CaptureSystem)
@@ -403,8 +403,9 @@ Claude Code가 작업을 받을 때 반드시 따를 원칙:
 6. **한국어 주석**: 모든 주석 및 Inspector 표시 문자열은 한국어로 작성.
 7. **밸런스 수치 분리**: 게임 밸런스 관련 수치는 `GameConstants.cs` 또는 ScriptableObject에 집중 관리.
 8. **파일 명 규칙**: 생성할 파일의 이름 앞에 RT_를 붙일 것.
+9. **최적화 고려한 코드 작성**: 최적화를 고려해서 코드 작성하기.
 
 ---
 
-*문서 최초 작성: 2026-03-08*
-*버전: v1.1 (Unity 환경 설정 + 게임 설계 통합본)*
+*문서 최초 작성: 2026-03-10*
+*버전: v1.2 (Unity 환경 설정 + 게임 설계 통합본)*

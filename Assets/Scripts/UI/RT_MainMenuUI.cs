@@ -10,14 +10,13 @@ public class RT_MainMenuUI : MonoBehaviour
     private void Start()
     {
         BindButton("ButtonPanel/Btn_NewGame",  OnNewGameClicked);
-        BindButton("ButtonPanel/Btn_Continue", OnContinueClicked);
         BindButton("ButtonPanel/Btn_Settings", OnSettingsClicked);
         BindButton("ButtonPanel/Btn_Quit",     OnQuitClicked);
 
-        // 진행 중인 런이 없으면 계속하기 버튼 비활성화
-        var continueBtn = transform.Find("ButtonPanel/Btn_Continue")?.GetComponent<Button>();
-        if (continueBtn != null && GameManager.Instance != null)
-            continueBtn.interactable = GameManager.Instance.SaveData.isRunActive;
+        // 계속하기 버튼은 interactable 설정이 필요해 직접 참조 보관
+        var continueBtn = BindButton("ButtonPanel/Btn_Continue", OnContinueClicked);
+        if (continueBtn != null && RT_GameManager.Instance != null)
+            continueBtn.interactable = RT_GameManager.Instance.SaveData.isRunActive;
     }
 
     // ─────────────────────────────────────────
@@ -26,17 +25,17 @@ public class RT_MainMenuUI : MonoBehaviour
 
     private void OnNewGameClicked()
     {
-        if (GameManager.Instance == null) return;
-        GameManager.Instance.DeleteSave();   // 기존 런 초기화 후 새 게임 시작
-        GameManager.Instance.StartNewRun();
+        if (RT_GameManager.Instance == null) return;
+        RT_GameManager.Instance.DeleteSave();   // 기존 런 초기화 후 새 게임 시작
+        RT_GameManager.Instance.StartNewRun();
     }
 
     private void OnContinueClicked()
     {
-        if (GameManager.Instance == null) return;
+        if (RT_GameManager.Instance == null) return;
 
-        if (GameManager.Instance.SaveData.isRunActive)
-            GameManager.Instance.ContinueRun();
+        if (RT_GameManager.Instance.SaveData.isRunActive)
+            RT_GameManager.Instance.ContinueRun();
         else
             Debug.Log("[MainMenuUI] 진행 중인 런이 없습니다.");
     }
@@ -60,12 +59,14 @@ public class RT_MainMenuUI : MonoBehaviour
     // 헬퍼
     // ─────────────────────────────────────────
 
-    private void BindButton(string path, UnityEngine.Events.UnityAction callback)
+    /// <summary>버튼을 찾아 콜백을 등록하고 Button 컴포넌트를 반환 (추가 설정에 사용)</summary>
+    private Button BindButton(string path, UnityEngine.Events.UnityAction callback)
     {
         var btn = transform.Find(path)?.GetComponent<Button>();
         if (btn != null)
             btn.onClick.AddListener(callback);
         else
-            Debug.LogWarning($"[MainMenuUI] 버튼을 찾을 수 없음: {path}");
+            Debug.LogWarning($"[RT_MainMenuUI] 버튼을 찾을 수 없음: {path}");
+        return btn;
     }
 }

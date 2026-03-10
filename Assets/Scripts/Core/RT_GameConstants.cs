@@ -83,6 +83,11 @@ public static class GameConstants
     // ─── 카메라 추적 ─────────────────────────────────────────────────────────
     public const float CAMERA_FOLLOW_SMOOTH   = 5f;
 
+    // ─── 씬 인덱스 ───────────────────────────────────────────────────────
+    public const int SCENE_MAIN_MENU = 0;
+    public const int SCENE_DUNGEON   = 1;
+    public const int SCENE_META_HUB  = 2;
+
     // ─── 비주얼 / 카메라 ──────────────────────────────────────────────────
     public const int PIXELS_PER_UNIT = 16;
 

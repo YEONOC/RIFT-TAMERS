@@ -12,6 +12,11 @@ public class RT_TamerController : MonoBehaviour
     private Rigidbody2D _rb;
     private Animator    _animator;
 
+    // Animator 파라미터 해시 캐싱 (문자열 룩업 비용 제거)
+    private static readonly int _hashIsMoving = Animator.StringToHash("IsMoving");
+    private static readonly int _hashMoveX    = Animator.StringToHash("MoveX");
+    private static readonly int _hashMoveY    = Animator.StringToHash("MoveY");
+
     private Vector2 _moveInput;
     private Vector2 _lastMoveDir = Vector2.down; // 마지막 이동 방향 (대시 방향 결정용)
 
@@ -136,11 +141,11 @@ public class RT_TamerController : MonoBehaviour
             animDir  = _moveInput;
         }
 
-        _animator.SetBool("IsMoving", isMoving);
+        _animator.SetBool(_hashIsMoving, isMoving);
         if (isMoving)
         {
-            _animator.SetFloat("MoveX", animDir.x);
-            _animator.SetFloat("MoveY", animDir.y);
+            _animator.SetFloat(_hashMoveX, animDir.x);
+            _animator.SetFloat(_hashMoveY, animDir.y);
         }
     }
 

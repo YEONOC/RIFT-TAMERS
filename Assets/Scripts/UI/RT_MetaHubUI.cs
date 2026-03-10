@@ -23,8 +23,8 @@ public class RT_MetaHubUI : MonoBehaviour
 
     private void OnStartRunClicked()
     {
-        if (GameManager.Instance == null) return;
-        GameManager.Instance.StartNewRun();
+        if (RT_GameManager.Instance == null) return;
+        RT_GameManager.Instance.StartNewRun();
     }
 
     private void OnCompendiumClicked()
@@ -52,7 +52,7 @@ public class RT_MetaHubUI : MonoBehaviour
     /// <summary>상단 테이머 레벨/이름 텍스트 갱신</summary>
     private void RefreshTamerInfo()
     {
-        if (GameManager.Instance == null) return;
+        if (RT_GameManager.Instance == null) return;
 
         var textObj = transform.Find("Panel_TamerInfo/Text_TamerLevel");
         if (textObj == null) return;
@@ -60,7 +60,7 @@ public class RT_MetaHubUI : MonoBehaviour
         var text = textObj.GetComponent<Text>();
         if (text == null) return;
 
-        int lv = GameManager.Instance.SaveData.tamerLevel;
+        int lv = RT_GameManager.Instance.SaveData.tamerLevel;
         text.text = $"Lv.{lv} 테이머";
     }
 
